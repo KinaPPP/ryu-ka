@@ -17,7 +17,7 @@ resizeCanvas();
 // ==========================================
 const masterLimiter = new Tone.Limiter(-6).toDestination();
 
-// ★音階を全体的に1オクターブ高く（+12）設定
+// ★音階を全体的に1オクターブ高く（+12）設定：琉球音階
 const RYUKYU_SCALE = [
     48, 52, 53, 55, 59, // C3, E3, F3, G3, B3
     60, 64, 65, 67, 71, // C4...
@@ -44,7 +44,6 @@ const lowSynth = new Tone.PolySynth(Tone.Synth, {
     }
 }).connect(masterLimiter);
 
-// 矩形波は音が目立つので音量を少し下げてバランスをとる
 highSynth.volume.value = -18;
 lowSynth.volume.value = -10;
 
@@ -114,6 +113,7 @@ function spawnRipple(x, y, isHighRes = true) {
 
 canvas.addEventListener('pointerdown', async (e) => {
     if (activePointers.size >= 4) return;
+    // ※全画面化（requestFullscreen）はPWAで対応するため削除済み
     if (Tone.context.state !== 'running') await Tone.context.resume();
     if (!isAudioStarted) { await Tone.start(); isAudioStarted = true; }
     
@@ -202,10 +202,10 @@ function loop(time) {
     // ★沖縄の箸（うめーし）を模した赤・黄ツートンカラー
     const g = ctx.createLinearGradient(0, canvas.height, canvas.width, 0);
     
-    // ★赤の領域を左下に抑える調整。境界を左下寄りに移動。
+    // ★0.3付近に境界を設定し、バランスの良い斜めツートンに
     g.addColorStop(0, '#cc0000');     // 濃い赤（左下）
-    g.addColorStop(0.1, '#e63946');   // 赤の境界（0.48から移動）
-    g.addColorStop(0.15, '#f4d03f');  // 黄色の境界（0.52から移動）
+    g.addColorStop(0.3, '#e63946');   // 赤の境界
+    g.addColorStop(0.35, '#f4d03f');  // 黄色の境界
     g.addColorStop(1, '#ffcc00');     // 鮮やかな黄色（右上）
 
     ctx.fillStyle = g;
