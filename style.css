@@ -1,0 +1,16 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #050505;
+    overflow: hidden; /* スクロールバーを消す */
+}
+
+canvas {
+    width: 100vw;
+    height: 100vh;
+    display: block;
+    cursor: crosshair;
+    touch-action: none; /* ★追加：ブラウザのスクロールやズームを完全無効化 */
+}

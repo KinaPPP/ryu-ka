@@ -1,0 +1,20 @@
+{
+  "name": "Ryu-Ka",
+  "short_name": "Ryu-Ka",
+  "display": "fullscreen",
+  "background_color": "#ffcc00",
+  "theme_color": "#cc0000",
+  "start_url": "./index.html",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
