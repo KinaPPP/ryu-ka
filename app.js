@@ -153,6 +153,18 @@ function endPointer(e) {
 canvas.addEventListener('pointerup', endPointer);
 canvas.addEventListener('pointercancel', endPointer);
 
+// ▼▼▼ ここから追加：PC環境向けの強力な安全装置 ▼▼▼
+
+// 1. マウスがキャンバス（画面）の外にハミ出した瞬間に「離した」ことにする
+canvas.addEventListener('pointerleave', endPointer);
+canvas.addEventListener('pointerout', endPointer);
+
+// 2. Alt+Tabや、別のウィンドウをクリックしてアプリからフォーカスが外れた時に完全リセットする
+window.addEventListener('blur', () => {
+    activePointers.clear();
+    pointerTrails.clear();
+});
+
 // ==========================================
 // 5. アニメーションループ ＆ 呼吸するガイド演出
 // ==========================================
