@@ -17,12 +17,12 @@ resizeCanvas();
 // ==========================================
 const masterLimiter = new Tone.Limiter(-6).toDestination();
 
-// ★音階を全体的に1オクターブ高く（+12）設定：琉球音階
+// ★琉球音階：上限を84(C6)で頭打ちに変更（高音域のファミコン化を防ぐ）
 const RYUKYU_SCALE = [
     48, 52, 53, 55, 59, // C3, E3, F3, G3, B3
     60, 64, 65, 67, 71, // C4...
     72, 76, 77, 79, 83, // C5...
-    84, 88, 89, 91, 95  // C6...
+    84, 84, 84, 84, 84  // 上限84(C6)で頭打ち
 ];
 
 const highSynth = new Tone.PolySynth(Tone.Synth, {
@@ -35,12 +35,14 @@ const lowSynth = new Tone.PolySynth(Tone.Synth, {
     maxPolyphony: 16,
     oscillator: { type: "square" }, 
     envelope: { 
-        attack: 0.005, decay: 0.3, sustain: 0.05, release: 1.0 
+        // ★attack を 0.005 → 0.015 に緩めて「バチ感」を保ちつつファミコン感を抑制
+        attack: 0.015, decay: 0.3, sustain: 0.05, release: 1.0 
     }
 }).connect(masterLimiter);
 
 highSynth.volume.value = -18;
-lowSynth.volume.value = -10;
+// ★lowSynth を -10 → -14 に下げて high との差を広げ、立体感を出す
+lowSynth.volume.value = -14;
 
 // ==========================================
 // 3. 波紋クラス
@@ -74,7 +76,6 @@ class Ripple {
     draw(ctx) {
         const maxR = Math.sqrt(canvas.width**2 + canvas.height**2);
         let alpha = Math.max(0, 1 - (this.r / maxR));
-        // ★鮮やかな背景に映える純白の波紋
         ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
         ctx.lineWidth = 1.2;
         ctx.beginPath(); ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2); ctx.stroke();
@@ -94,13 +95,11 @@ class LightTrail {
         this.points.push({ x, y, time });
     }
     draw(ctx, currentTime) {
-        // ★約2/3の長さ（660ms）でスッと消えるように
         this.points = this.points.filter(p => currentTime - p.time < 660);
         if (this.points.length < 2) return;
 
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
-        // ★軌跡を波紋より少し太くして滑らかさを強調
         ctx.lineWidth = 2.5; 
 
         for (let i = 1; i < this.points.length - 1; i++) {
@@ -114,7 +113,6 @@ class LightTrail {
             const age = currentTime - p1.time;
             let alpha = Math.max(0, 1 - (age / 660));
 
-            // ★Ryu-Ka の純白の軌跡
             ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.5})`; 
             ctx.beginPath();
 
@@ -280,7 +278,6 @@ function drawGuide(ctx, time) {
     const r = baseR * (1 - shrinkRatio * 0.15);
     const innerR = r * 0.6; 
 
-    // ★純白のガイドサークル
     ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.8})`;
     ctx.lineWidth = 1.5;
     ctx.beginPath();
@@ -296,12 +293,11 @@ function drawGuide(ctx, time) {
 function loop(time) {
     if (!time) time = performance.now();
 
-    // ★沖縄の箸（うめーし）を模した赤・黄ツートンカラー
     const g = ctx.createLinearGradient(0, canvas.height, canvas.width, 0);
-    g.addColorStop(0, '#cc0000');     // 濃い赤（左下）
-    g.addColorStop(0.3, '#e63946');   // 赤の境界
-    g.addColorStop(0.35, '#f4d03f');  // 黄色の境界
-    g.addColorStop(1, '#ffcc00');     // 鮮やかな黄色（右上）
+    g.addColorStop(0, '#cc0000');
+    g.addColorStop(0.3, '#e63946');
+    g.addColorStop(0.35, '#f4d03f');
+    g.addColorStop(1, '#ffcc00');
 
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -326,5 +322,4 @@ function loop(time) {
     requestAnimationFrame(loop);
 }
 
-// ループ開始
 requestAnimationFrame(loop);
